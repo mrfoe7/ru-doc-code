@@ -5,6 +5,8 @@ import (
 	"math/big"
 	"strconv"
 	"strings"
+
+	"github.com/asaskevich/govalidator"
 )
 
 func RandomDigits(len int) int64 {
@@ -29,4 +31,17 @@ func StrToArr(str string) ([]int, error) {
 		arr = append(arr, number)
 	}
 	return arr, nil
+}
+
+func ValidateStruct(v interface{}) bool {
+	ok, err := govalidator.ValidateStruct(v)
+	if !ok {
+		_ = govalidator.ErrorsByField(err)
+		//for field, errText := range data {
+		//
+		//}
+		return false
+	}
+
+	return true
 }

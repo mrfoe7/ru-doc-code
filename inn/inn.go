@@ -12,12 +12,11 @@ const (
 	lengthPhysical = 12
 )
 
+// INN base struct of document codes
 type INN struct {
-	Code         ru_doc_code.TaxRegionCode
-	SerialNumber ru_doc_code.SerialNumber
-	Hash10       uint
-	Hash11       uint
-	Hash12       uint
+	Code         ru_doc_code.TaxRegionCode `code:"length=4" valid:""`
+	SerialNumber ru_doc_code.SerialNumber `code:"length=5,6" valid:""`
+	CheckSum     uint `code:"length=1,2" valid:""`
 }
 
 // Validate check to valid inn from input string.

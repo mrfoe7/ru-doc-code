@@ -37,3 +37,7 @@ if isValid {
 - Info about OGRNIP - [ОГРНИП](http://www.temabiz.com/terminy/chto-takoe-ogrnip.html)
 - Info about BIK - [БИК](https://ru.wikipedia.org/wiki/%D0%91%D0%B0%D0%BD%D0%BA%D0%BE%D0%B2%D1%81%D0%BA%D0%B8%D0%B9_%D0%B8%D0%B4%D0%B5%D0%BD%D1%82%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%BD%D1%8B%D0%B9_%D0%BA%D0%BE%D0%B4)
 - Info about KPP - [КПП](https://dic.academic.ru/dic.nsf/ruwiki/239834)
+
+## Develop
+
+Important struct orders field into code's type 

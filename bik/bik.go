@@ -6,8 +6,14 @@ import (
 	ru_doc_code "github.com/mrfoe7/ru-doc-code"
 )
 
+// BIK base struct of document codes
+type BIK struct {
+
+}
+
+
 // Validate check to valid BIK format
-// example valid format is 044525225
+// example: input format is  044525225
 func Validate(bik string) (bool, error) {
 	if len(bik) != 9 {
 		name, err := ru_doc_code.GetModuleName()

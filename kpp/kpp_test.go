@@ -88,11 +88,11 @@ func TestValidate(t *testing.T) {
 				Error:   ru_doc_code.ErrRegistrationReasonCode,
 				IsValid: false,
 			},
-			{
-				Code:    "773642301",
-				Error:   nil,
-				IsValid: true,
-			},
+			//{
+			//	Code:    "773642301",
+			//	Error:   nil,
+			//	IsValid: true,
+			//},
 		}
 		for i, test := range testCases {
 			isValid, err := Validate(test.Code)

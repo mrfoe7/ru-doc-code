@@ -1,10 +1,10 @@
 package ru_doc_code
 
-type SerialNumber string
-
-type TaxRegionCode string
-
-type RegistrationReasonCode string
+type (
+	RegistrationReasonCode string
+	TaxRegionCode string
+	SerialNumber string
+)
 
 type TaxOffice struct {
 	RegionCode TaxRegionCode
