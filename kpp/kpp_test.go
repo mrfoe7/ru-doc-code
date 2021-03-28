@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	ru_doc_code "github.com/mrfoe7/ru-doc-code"
 )
@@ -38,7 +39,22 @@ func TestValidate(t *testing.T) {
 		for i, test := range testCases {
 			isValid, err := Validate(test.Code)
 			assert.Equal(t, isValid, test.IsValid, fmt.Sprintf(ru_doc_code.TestTmpl, i, test.Code))
-			assert.ErrorIs(t, err, test.Error, fmt.Sprintf(ru_doc_code.TestTmpl, i, test.Code))
+
+			checkErrFunc := assert.NoError
+			if test.Error != nil {
+				checkErrFunc = assert.Error
+			}
+			checkErrFunc(t, err, fmt.Sprintf(ru_doc_code.TestTmpl, i, test.Code))
+
+			if err != nil {
+				var expErr *ru_doc_code.CommonError
+				require.ErrorAs(t, err, &expErr, fmt.Sprintf(ru_doc_code.TestTmpl, i, test.Code))
+
+				retCommonErr, ok := err.(*ru_doc_code.CommonError)
+				require.True(t, ok, "upcast does not success")
+
+				assert.ErrorIs(t, retCommonErr.Err, test.Error, fmt.Sprintf(ru_doc_code.TestTmpl, i, test.Code))
+			}
 		}
 	})
 
