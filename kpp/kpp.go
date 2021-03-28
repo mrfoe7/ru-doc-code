@@ -1,17 +1,15 @@
 package kpp
 
 import (
-	"fmt"
-
 	ru_doc_code "github.com/mrfoe7/ru-doc-code"
 )
 
 const kppLength = 9
 
 type KPP struct {
-	Code         ru_doc_code.TaxRegionCode `code:"length=4" valid:"runelength4_custom"`
+	Code         ru_doc_code.TaxRegionCode          `code:"length=4" valid:"runelength4_custom"`
 	Reason       ru_doc_code.RegistrationReasonCode `code:"length=2" valid:"runelength2_custom"`
-	SerialNumber ru_doc_code.SerialNumber `code:"length=3" valid:"runelength3_custom"`
+	SerialNumber ru_doc_code.SerialNumber           `code:"length=3" valid:"runelength3_custom"`
 }
 
 // Validate check to valid KPP format
@@ -38,11 +36,10 @@ func Validate(kpp string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Println("value", value)
 
 	// todo: validate tax region/office ru_doc_code.TaxRegionCode(kpp[:4])
 
-	_, ok := ru_doc_code.SupportedRegistrationReasonSet[ru_doc_code.RegistrationReasonCode(kpp[4:6])]
+	_, ok := ru_doc_code.SupportedRegistrationReasonSet[value.Reason]
 	if !ok {
 		return false, ru_doc_code.ErrRegistrationReasonCode
 	}

@@ -2,10 +2,10 @@ package ru_doc_code
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
+	"unsafe"
 )
 
 const tagName string = "code"
@@ -20,73 +20,79 @@ func (i *InvalidUnmarshalError) Error() string {
 	return "code: failed unmarshal" + i.Err.Error()
 }
 
-
-func Unmarshal(data []byte, v interface{}) error {
-	rv := reflect.ValueOf(v)
-	if rv.Kind() != reflect.Ptr || rv.IsNil() {
-		return &InvalidUnmarshalError{errors.New("unmarshal non-pointer")}
+func Unmarshal(data []byte, src interface{}) error {
+	typ := reflect.TypeOf(src)
+	if typ.Kind() != reflect.Ptr {
+		return &InvalidUnmarshalError{errors.New("source is not pointer")}
 	}
 
-	t := reflect.TypeOf(v)
+	if typ = typ.Elem(); typ.Kind() != reflect.Struct {
+		return &InvalidUnmarshalError{errors.New("source is not struct")}
+	}
+	if onlyPrivateFields(typ) {
+		return &InvalidUnmarshalError{errors.New("source struct has not exported fields")}
+	}
 
 	var pos int
+	srcRv := reflect.ValueOf(src).Elem()
 
-	fmt.Println(t.NumField())
-	for i:=0; i< t.NumField(); i++ {
-		field := t.Field(i)
-		fmt.Println(field)
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+
 		tag := field.Tag.Get(tagName)
 		nums := strings.Split(tag, "=")
-		fmt.Println(field)
-		if len(nums) == 0 && len(nums) > 2 {
+
+		//todo: add 4,5,6 or 4|5 length value
+		if len(nums) != 2 {
 			continue
 		}
 
-		fmt.Println(lengthTagParam)
-		// does not supported tag params
 		if nums[0] != lengthTagParam {
 			continue
 		}
 
-		fmt.Println(field.Name, "tag", tag, field.Type)
-
-		//todo
 		shift, err := strconv.Atoi(nums[1])
 		if err != nil {
 			return err
 		}
 
-		//rnv := reflect.New(field.Type)
-		//fmt.Println(field.Type.ConvertibleTo(reflect.TypeOf(string(data[pos:pos+shift]))), data[pos:pos+shift], string(data[pos:pos+shift]))
-		//fmt.Println(field.Type)
-		//reflect.ValueOf()
-		sl := data[pos:pos+shift]
+		sl := data[pos : pos+shift]
+		fv := srcRv.Field(i)
 
-		var rnvValue reflect.Value
-		switch field.Type.String() {
-		case "string":
-			rnvValue = reflect.ValueOf(string(sl))
-		case "ru_doc_code.TaxRegionCode":
-			rnvValue = reflect.ValueOf(TaxRegionCode(sl))
-		case "ru_doc_code.SerialNumber":
-			rnvValue = reflect.ValueOf(SerialNumber(sl))
-		case "ru_doc_code.RegistrationReasonCode":
-			rnvValue = reflect.ValueOf(RegistrationReasonCode(sl))
+		switch field.Type.Kind() {
+		case reflect.String:
+			str := string(sl)
+			v := reflect.NewAt(fv.Type(), unsafe.Pointer(reflect.ValueOf(&str).Elem().UnsafeAddr())).Elem()
+			fv.Set(v)
 		default:
-			return &InvalidUnmarshalError{
-				Err: errors.New("does not compare input and data"),
-			}
 		}
 		pos += shift
-
-		fmt.Println(rnvValue, pos)
-		fmt.Println("rnvValue", rnvValue, "rv", rv.Elem().Field(i))
-		//rv.Elem().Field(i).Set(rnvValue)
 	}
 
-	//todo: warning
+	//todo: warning message but not correct
 	if len(data) != pos {
 	}
 
 	return nil
+}
+
+func onlyPrivateFields(typ reflect.Type) bool {
+	for i := 0; i < typ.NumField(); i++ {
+		tf := typ.Field(i).Type
+		if typ.Field(i).Type.Kind() == reflect.Ptr {
+			tf = typ.Field(i).Type.Elem()
+		}
+		if tf.Kind() == reflect.Struct && !isPrivateField(typ.Field(i)) {
+			if !onlyPrivateFields(tf) {
+				return false
+			}
+		} else if !isPrivateField(typ.Field(i)) {
+			return false
+		}
+	}
+	return true
+}
+
+func isPrivateField(sf reflect.StructField) bool {
+	return len(sf.PkgPath) != 0 && !sf.Anonymous
 }

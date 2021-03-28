@@ -8,9 +8,7 @@ import (
 
 // BIK base struct of document codes
 type BIK struct {
-
 }
-
 
 // Validate check to valid BIK format
 // example: input format is  044525225

@@ -9,6 +9,10 @@ import (
 	"github.com/asaskevich/govalidator"
 )
 
+var (
+	TestTmpl = "invalid test case %d: input: %s"
+)
+
 func RandomDigits(len int) int64 {
 	if len <= 0 {
 		len = 1
